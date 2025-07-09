@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-const version = "v1.0.0"
+const version = "v1.0.1"
 
 type BodyfileEntry struct {
 	Zero           string
@@ -160,30 +160,36 @@ func parseBodyfileLine(line string) (*BodyfileEntry, error) {
 	// Split by pipe character
 	fields := strings.Split(line, "|")
 
-	// Bodyfile format should have exactly 11 fields
-	if len(fields) != 11 {
-		return nil, fmt.Errorf("invalid bodyfile format: expected 11 fields, got %d", len(fields))
+	// Bodyfile format can have 10 or 11 fields (CrTime may not be available on all filesystems)
+	if len(fields) < 10 || len(fields) > 11 {
+		return nil, fmt.Errorf("invalid bodyfile format: expected 10 or 11 fields, got %d", len(fields))
 	}
 
 	entry := &BodyfileEntry{
-		Zero:   fields[0],
-		Name:   fields[1],
-		Inode:  fields[2],
-		Mode:   fields[3],
-		UID:    fields[4],
-		GID:    fields[5],
-		Size:   fields[6],
-		ATime:  fields[7],
-		MTime:  fields[8],
-		CTime:  fields[9],
-		CrTime: fields[10],
+		Zero:  fields[0],
+		Name:  fields[1],
+		Inode: fields[2],
+		Mode:  fields[3],
+		UID:   fields[4],
+		GID:   fields[5],
+		Size:  fields[6],
+		ATime: fields[7],
+		MTime: fields[8],
+		CTime: fields[9],
+	}
+
+	// Handle CrTime - may not be present on all filesystems
+	if len(fields) == 11 {
+		entry.CrTime = fields[10]
+	} else {
+		entry.CrTime = "0" // Default to 0 if not available
 	}
 
 	// Convert timestamps to human-readable format
 	entry.ATimeReadable = convertTimestamp(fields[7])
 	entry.MTimeReadable = convertTimestamp(fields[8])
 	entry.CTimeReadable = convertTimestamp(fields[9])
-	entry.CrTimeReadable = convertTimestamp(fields[10])
+	entry.CrTimeReadable = convertTimestamp(entry.CrTime)
 
 	return entry, nil
 }
