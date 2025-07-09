@@ -1,7 +1,7 @@
 
 ## Overview
 
-`bdf2csv` converts [Unix-like Artifacts Collector (UAC)](https://github.com/tclahr/uac) bodyfiles into CSV format with human-readable timestamps.
+`bdf2csv` converts [Unix-like Artifacts Collector (UAC)](https://github.com/tclahr/uac) Linux bodyfiles into CSV format with human-readable timestamps in UTC.
 
 ## Installation
 
@@ -31,4 +31,3 @@ go build -o bdf2csv
 9. **MTime** - Modify time
 10. **CTime** - Change time
 11. **CrTime** - Creation time
-
